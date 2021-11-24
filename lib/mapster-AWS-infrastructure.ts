@@ -16,13 +16,9 @@ export class MapsterAWSInfrastructureStack extends cdk.Stack {
         })
 
         // CloudFront
-        const distribution = new cloudfront.Distribution(
-            this,
-            'mapsterDistribution',
-            {
-                defaultBehavior: { origin: new S3Origin(devBucket) },
-            }
-        )
+        new cloudfront.Distribution(this, 'mapsterDistribution', {
+            defaultBehavior: { origin: new S3Origin(devBucket) },
+        })
 
         // example resource
         // const queue = new sqs.Queue(this, 'InfrastructureForAwsQueue', {
