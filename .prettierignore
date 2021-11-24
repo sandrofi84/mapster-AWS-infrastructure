@@ -1,0 +1,9 @@
+
+.next
+node_modules
+.vscode
+.DS_Store
+
+# Ignore artifacts:
+build
+coverage
