@@ -27,7 +27,7 @@ jobs:
         with:
           node-version: 14
       - name: Install Global packages
-        run: npm install -g yarn aws-cli
+        run: npm install -g yarn aws-cdk
       - name: Install dependencies
         run: yarn install --frozen-lockfile
       - name: Set Deployment ENV
