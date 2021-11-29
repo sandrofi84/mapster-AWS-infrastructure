@@ -44,7 +44,10 @@ export class MapsterAWSInfrastructureStack extends cdk.Stack {
         bucketPolicy.document.addStatements(
             new iam.PolicyStatement({
                 effect: iam.Effect.ALLOW,
-                actions: ['s3:GetObject', 's3:DeleteObject', 's3:PutObject'],
+                actions: ['s3:DeleteObject', 's3:PutObject'],
+                principals: [
+                    new iam.AccountPrincipal(process.env.AWS_ACCOUNT_ID),
+                ],
                 resources: [`${bucket.bucketArn}/*`],
                 conditions: {
                     StringEquals: { 'aws:PrincipalTag/env': environment },
