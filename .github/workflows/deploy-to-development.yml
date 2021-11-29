@@ -31,8 +31,6 @@ jobs:
         run: npm install -g yarn aws-cdk
       - name: Install dependencies
         run: yarn install --frozen-lockfile
-      - name: Set Deployment ENV
-        run: DEPLOYMENT_ENV=dev
       - name: Configure AWS with credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
