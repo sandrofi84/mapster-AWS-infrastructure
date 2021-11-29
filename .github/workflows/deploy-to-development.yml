@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: Deploy AWS Infrastructure
+name: Deploy to Development
 
 # Controls when the workflow will run
 on:
@@ -27,17 +27,19 @@ jobs:
         with:
           node-version: 14
       - name: Install Global packages
-        run: npm install -g yarn aws-cli aws-cdk
+        run: npm install -g yarn aws-cli
       - name: Install dependencies
         run: yarn install --frozen-lockfile
-      - name: CDK Synth
-        run: cdk synth
+      - name: Set Deployment ENV
+        run: DEPLOYMENT_ENV=dev
       - name: Configure AWS with credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-west-2
+      - name: CDK Synth
+        run: cdk synth
       - name: CDK Deploy
         run: cdk deploy --require-approval never
 
