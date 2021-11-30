@@ -44,7 +44,12 @@ export class MapsterAWSInfrastructureStack extends cdk.Stack {
         bucketPolicy.document.addStatements(
             new iam.PolicyStatement({
                 effect: iam.Effect.ALLOW,
-                actions: ['s3:DeleteObject', 's3:PutObject'],
+                actions: [
+                    's3:GetObject',
+                    's3:DeleteObject',
+                    's3:PutObject',
+                    's3:ListBucket',
+                ],
                 principals: [
                     new iam.AccountPrincipal(process.env.AWS_ACCOUNT_ID),
                 ],
