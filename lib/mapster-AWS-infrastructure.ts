@@ -28,7 +28,6 @@ export class MapsterAWSInfrastructureStack extends cdk.Stack {
             bucketName: isProd
                 ? 'mapster-bucket-production'
                 : 'mapster-bucket-development',
-            publicReadAccess: true,
             websiteIndexDocument: 'index.html',
             removalPolicy: cdk.RemovalPolicy.RETAIN,
         }
@@ -44,16 +43,28 @@ export class MapsterAWSInfrastructureStack extends cdk.Stack {
         bucketPolicy.document.addStatements(
             new iam.PolicyStatement({
                 effect: iam.Effect.ALLOW,
-                actions: [
-                    's3:GetObject',
-                    's3:DeleteObject',
-                    's3:PutObject',
-                    's3:ListBucket',
-                ],
+                actions: ['s3:GetObject'],
+                principals: [new iam.AnyPrincipal()],
+                resources: [`${bucket.bucketArn}/*`],
+            }),
+            new iam.PolicyStatement({
+                effect: iam.Effect.ALLOW,
+                actions: ['s3:GetObject', 's3:DeleteObject', 's3:PutObject'],
                 principals: [
                     new iam.AccountPrincipal(process.env.AWS_ACCOUNT_ID),
                 ],
                 resources: [`${bucket.bucketArn}/*`],
+                conditions: {
+                    StringEquals: { 'aws:PrincipalTag/env': environment },
+                },
+            }),
+            new iam.PolicyStatement({
+                effect: iam.Effect.ALLOW,
+                actions: ['s3:ListBucket'],
+                principals: [
+                    new iam.AccountPrincipal(process.env.AWS_ACCOUNT_ID),
+                ],
+                resources: [`${bucket.bucketArn}`],
                 conditions: {
                     StringEquals: { 'aws:PrincipalTag/env': environment },
                 },
