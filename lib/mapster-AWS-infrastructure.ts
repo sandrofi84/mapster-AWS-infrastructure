@@ -1,5 +1,4 @@
 import * as cdk from '@aws-cdk/core'
-import * as iam from '@aws-cdk/aws-iam'
 import * as s3 from '@aws-cdk/aws-s3'
 import * as cloudfront from '@aws-cdk/aws-cloudfront'
 import { S3Origin } from '@aws-cdk/aws-cloudfront-origins'
@@ -7,6 +6,10 @@ import { S3Origin } from '@aws-cdk/aws-cloudfront-origins'
 export type DeploymentEnv = 'prod' | 'dev'
 interface MapsterAWSInfrastructureStackProps extends cdk.StackProps {
     deploymentEnvironment: DeploymentEnv
+}
+interface BucketData {
+    id: string
+    props: s3.BucketProps
 }
 
 export class MapsterAWSInfrastructureStack extends cdk.Stack {
@@ -18,58 +21,19 @@ export class MapsterAWSInfrastructureStack extends cdk.Stack {
         super(scope, id, props)
         const environment = props.deploymentEnvironment
         const isProd = environment === 'prod'
-        const bucketId = isProd
-            ? 'mapsterBucketProduction'
-            : 'mapsterBucketDevelopment'
-        const bucketPolicyId = isProd
-            ? 'mapsterBucketPolicyProduction'
-            : 'mapsterBucketPolicyDevelopment'
-        const bucketProps: s3.BucketProps = {
-            bucketName: isProd
-                ? 'mapster-bucket-production'
-                : 'mapster-bucket-development',
-            websiteIndexDocument: 'index.html',
-            removalPolicy: cdk.RemovalPolicy.RETAIN,
+        const bucketData: BucketData = {
+            id: isProd ? 'mapsterBucketProduction' : 'mapsterBucketDevelopment',
+            props: {
+                bucketName: isProd
+                    ? 'mapster-bucket-production'
+                    : 'mapster-bucket-development',
+                websiteIndexDocument: 'index.html',
+                publicReadAccess: true,
+                removalPolicy: cdk.RemovalPolicy.RETAIN,
+            },
         }
         // create S3 bucket
-        const bucket = new s3.Bucket(this, bucketId, bucketProps)
-
-        // create the bucket policy
-        const bucketPolicy = new s3.BucketPolicy(this, bucketPolicyId, {
-            bucket: bucket,
-        })
-
-        // add policy statements ot the bucket policy
-        bucketPolicy.document.addStatements(
-            new iam.PolicyStatement({
-                effect: iam.Effect.ALLOW,
-                actions: ['s3:GetObject'],
-                principals: [new iam.AnyPrincipal()],
-                resources: [`${bucket.bucketArn}/*`],
-            }),
-            new iam.PolicyStatement({
-                effect: iam.Effect.ALLOW,
-                actions: ['s3:GetObject', 's3:DeleteObject', 's3:PutObject'],
-                principals: [
-                    new iam.AccountPrincipal(process.env.AWS_ACCOUNT_ID),
-                ],
-                resources: [`${bucket.bucketArn}/*`],
-                conditions: {
-                    StringEquals: { 'aws:PrincipalTag/env': environment },
-                },
-            }),
-            new iam.PolicyStatement({
-                effect: iam.Effect.ALLOW,
-                actions: ['s3:ListBucket'],
-                principals: [
-                    new iam.AccountPrincipal(process.env.AWS_ACCOUNT_ID),
-                ],
-                resources: [`${bucket.bucketArn}`],
-                conditions: {
-                    StringEquals: { 'aws:PrincipalTag/env': environment },
-                },
-            })
-        )
+        const bucket = new s3.Bucket(this, bucketData.id, bucketData.props)
 
         if (isProd) {
             // CloudFront

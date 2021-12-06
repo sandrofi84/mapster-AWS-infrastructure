@@ -1,13 +1,9 @@
 #!/usr/bin/env node
 import 'source-map-support/register'
 import { App, Tags } from '@aws-cdk/core'
-import {
-    DeploymentEnv,
-    MapsterAWSInfrastructureStack,
-} from '../lib/mapster-AWS-infrastructure'
+import { MapsterAWSInfrastructureStack } from '../lib/mapster-AWS-infrastructure'
 
-console.log('process.env.DEPLOYMENT_ENV: ', process.env.DEPLOYMENT_ENV)
-const environment = (process.env.DEPLOYMENT_ENV as DeploymentEnv) || 'dev'
+const environment = process.env.DEPLOYMENT_ENV === 'prod' ? 'prod' : 'dev'
 const isProd = environment === 'prod'
 const stackProps = {
     id: isProd
