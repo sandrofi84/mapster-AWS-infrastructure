@@ -11,3 +11,5 @@ jobs:
     uses:  sandrofi84/mapster-AWS-infrastructure/.github/workflows/deploy.yml@master
     with:
       env: dev
+      aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
